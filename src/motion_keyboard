@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+#
+
+from __future__ import print_function
+import rospy
+from sensor_msgs.msg import JointState
+from std_msgs.msg import String
+
+from markers import *
+from lab4functions import *
+
+Rd = np.array([[0,1,0],[1,0,0],[0,0,-1]])
+qd = rot2quat(Rd)
+# Find an xd that the robot can reach
+global xd
+xd = np.array([0.4, 0.4, 0.4, qd[0], qd[1], qd[2], qd[3]])
+
+ 
+ 
+def callback(msg):
+    global xd
+    if not msg.data =="0":
+        # Desired position
+        xd[0:3] = incremental(msg.data,xd[0:3])
+        print(xd)
+
+if __name__ == '__main__':
+    global xd
+    # Initialize the node
+    rospy.init_node("testKineControlPose")
+    print('starting motion ... ')
+    rospy.Subscriber("/keys", String, callback)
+    # Publisher: publish to the joint_states topic
+    pub = rospy.Publisher('joint_states', JointState, queue_size=1000)
+    # Markers for the current and desired positions
+    bmarker_current  = FrameMarker()
+    bmarker_desired = FrameMarker(0.5)
+
+    # Joint names
+    jnames = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint',
+              'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+
+
+    # Initial configuration
+    q0  = np.array([0.0, -1.0, 1.7, -2.2, -1.6, 0.0])
+
+    # Resulting initial pose (end effector with respect to the base link)
+    T = fkine(q0)
+    x0 = TF2xyzquat(T)
+
+    # Markers for the current and the desired pose
+    bmarker_current.setPose(x0)
+    bmarker_desired.setPose(xd)
+
+    # Instance of the JointState message
+    jstate = JointState()
+    # Values of the message
+    jstate.header.stamp = rospy.Time.now()
+    jstate.name = jnames
+    # Add the head joint value (with value 0) to the joints
+    jstate.position = q0
+
+    # Frequency (in Hz) and control period 
+    freq = 200
+    dt = 1.0/freq
+    rate = rospy.Rate(freq)
+
+    # Initial joint configuration
+    q = copy(q0)
+    x = copy(x0)
+    quat = x[3:7]
+    # Initialize the derror vector (derivative of the error)
+    derror = np.zeros(7)
+    # Main loop
+    #for i in range(1):
+    while not rospy.is_shutdown():
+        # Current time (needed for ROS)
+        jstate.header.stamp = rospy.Time.now()
+        # Kinematic control law for the pose (complete here)
+        # --------------------------------------------------
+        k=0.5
+        T = fkine(q)
+        x = T[0:3,3]
+        Q = rot2quat(T[0:3,0:3])
+        e = np.hstack(((x-xd[0:3]), quatError(xd[3:7], Q)))
+
+        if np.linalg.norm(e)>0.1:
+            Jac = jacobian_pose(q)
+            pinv = np.linalg.pinv(Jac)
+            q_des=np.dot(pinv,e.T)
+            q = q - dt*k*q_des
+        else:
+            print("Reached to desire position")
+        # -----------------------------
+        # Current configuration trnaformation to current position
+        T = fkine(q)
+        x = TF2xyzquat(T)
+        # Publish the message
+        jstate.position = q
+        pub.publish(jstate)
+        bmarker_desired.setPose(xd)
+        bmarker_current.setPose(x)
+        # Wait for the next iteration
+        rate.sleep()

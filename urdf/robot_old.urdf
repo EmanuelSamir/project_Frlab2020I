@@ -1,0 +1,171 @@
+<?xml version="1.0"?>
+
+<robot name="robot_demo">
+
+  <!-- Color of materials -->
+  <material name="yellow">
+    <color rgba="1 1 0 1"/>
+  </material>
+  <material name="blue">
+    <color rgba="0 0 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="1 0 0 1"/>
+  </material>
+
+  <link name="base">
+    <visual>
+      <geometry>
+        <cylinder length="0.0" radius="0.2"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="yellow" />
+    </visual>
+  </link>
+
+  <!--<joint name="pan_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="pan_link"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="pan_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.04"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.2"/>
+      <material name="blue" />
+    </visual>
+  </link>-->
+
+  <joint name="pan_joint" type="prismatic">
+    <parent link="base"/>
+    <child link="tilt_link"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 -1 0" />
+    <limit effort="300" velocity="0.1" lower="0" upper="1.5"/>
+  </joint>
+
+  <link name="tilt_link"> 
+    <visual>
+      <geometry>
+        <cylinder length="1.5" radius="0.04"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0.75 0.0"/>
+      <material name="red" />
+    </visual>
+  </link>
+
+  <joint name="tilt_joint" type="revolute"><!--cambio de nombre-->
+    <parent link="tilt_link"/><!--union a nuevo link-->
+    <child link="link_parado"/>  <!--link con nuevo nombre-->
+    <origin xyz="0 1.5 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link_parado"> 
+    <visual>
+      <geometry>
+        <cylinder length="0.8" radius="0.04"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.4"/>
+      <material name="blue" />
+    </visual>
+  </link>
+
+  <joint name="joint10" type="revolute">
+    <parent link="link_parado"/>
+    <child link="link10"/>
+    <origin xyz="0 0 0.8"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link10">
+    <visual>
+      <geometry>
+        <cylinder length="0.6" radius="0.04"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.3"/>
+      <material name="yellow" />
+    </visual>
+  </link>
+
+ <joint name="joint11" type="revolute">
+    <parent link="link10"/>
+    <child link="link11"/>
+    <origin xyz="0 0 0.6"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link11">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.04"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0.2 0"/>
+      <material name="blue" />
+    </visual>
+  </link>
+
+<joint name="jc1" type="revolute"><!--cambio de nombre-->
+    <parent link="link11"/><!--link con nuevo nombre-->
+    <child link="lc1"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0.4 0"/><!--altura nueva de link1-->
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="lc1"><!--nuevo link-->
+    <visual>
+      <geometry>
+        <sphere radius="0"/><!--geometria esfera de radio igual al del link1-->
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="red" />
+    </visual>
+  </link>
+
+  <joint name="jc2" type="revolute"><!--cambio de nombre-->
+    <parent link="lc1"/><!--link con nuevo nombre-->
+    <child link="lc2"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0 0"/><!--altura nueva de link1-->
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="lc2"><!--nuevo link-->
+    <visual>
+      <geometry>
+        <sphere radius="0"/><!--geometria esfera de radio igual al del link1-->
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="red" />
+    </visual>
+  </link>
+
+
+  <joint name="jc3" type="revolute"><!--cambio de nombre-->
+    <parent link="lc2"/><!--link con nuevo nombre-->
+    <child link="l5"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0 0"/><!--altura nueva de link1-->
+    <axis xyz="0 1 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="l5">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.04"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0.2 0"/>
+      <material name="red" />
+    </visual>
+  </link>
+
+</robot>

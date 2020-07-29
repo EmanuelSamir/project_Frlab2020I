@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+
+<robot name="robot_demo" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Joints Control in Gazebo -->
+  <gazebo>
+    <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so"/>
+  </gazebo>
+
+
+  <!-- Color of materials -->
+  <material name="yellow">
+    <color rgba="1 1 0 1"/>
+  </material>
+  <material name="blue">
+    <color rgba="0 0 1 1"/>
+  </material>
+  <material name="red">
+    <color rgba="1 0 0 1"/>
+  </material>
+  <material name="n_negro">
+    <color rgba="0.15 0.15 0.15 1"/>
+  </material>
+  <material name="b_negro">
+    <color rgba="0.37 0.37 0.37 1"/>
+  </material>
+  <material name="dorado">
+    <color rgba="1 0.74 0 1"/>
+  </material>
+
+  <material name="gris">
+    <color rgba="0.76 0.76 0.76 1"/>
+  </material>
+
+  <!-- World frame (for Gazebo) -->
+  <link name="world"/>
+
+  <!-- Arm fixed to world frame  -->
+  <joint name="world_foot_joint" type="fixed">
+    <parent link="world"/>
+    <child link="base_link"/>
+  </joint>
+
+
+  <link name="base_link">
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/base_robot.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="1.57075 0 1.57075" xyz="-0.45 -0.2 0"/>
+      <material name="gris" />
+    </visual>
+  </link>
+
+  <!--<joint name="pan_joint" type="revolute">
+    <parent link="base_link"/>
+    <child link="pan_link"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="pan_link">
+    <visual>
+      <geometry>
+        <cylinder length="0.4" radius="0.04"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0.2"/>
+      <material name="blue" />
+    </visual>
+  </link>-->
+
+
+  <joint name="pan_joint" type="prismatic">
+    <parent link="base_link"/>
+    <child link="tilt_link"/>
+    <origin xyz="0 0 0"/>
+    <axis xyz="0 -1 0" />
+    <limit effort="300" velocity="0.1" lower="0" upper="1.5"/>
+  </joint>
+
+  <link name="tilt_link"> 
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/base_movil_complete.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="1.57075 0 1.57075" xyz="0 1.3 0.064"/>
+      <material name="b_negro" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/base_movil_complete.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="36.17"/>
+      <!-- <origin rpy="1.57075 0 1.57075" xyz="0 1.3 0.064"/> -->
+      <inertia ixx="2.22" ixy="0.0" ixz="0.0" iyy="2.89" iyz="0.0" izz="1.08"/>
+    </inertial>
+  </link>
+
+  <joint name="tilt_joint" type="revolute"><!--cambio de nombre-->
+    <parent link="tilt_link"/><!--union a nuevo link-->
+    <child link="link_parado"/>  <!--link con nuevo nombre-->
+    <origin xyz="0 1.5 0"/>
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link_parado"> 
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_01.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0 0.305"/>
+      <material name="dorado" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_01.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="60.812"/>
+      <!-- <origin rpy="1.57075 0 0" xyz="0 0 0.305"/> -->
+      <inertia ixx="1.3519" ixy="0.000355" ixz="-0.000200" iyy="0.545256" iyz="-0.079511" izz="1.472254"/>
+    </inertial>
+  </link>
+
+  <joint name="joint10" type="revolute">
+    <parent link="link_parado"/>
+    <child link="link10"/>
+    <origin xyz="0 0 0.517"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link10">
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_02.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
+      <material name="n_negro" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_02.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="93.117"/>
+      <!-- <origin rpy="1.57075 0 0" xyz="0 0 0"/> -->
+      <inertia ixx="11.381652" ixy="-0.000192030" ixz="-0.00003446" iyy="0.384426" iyz="0.093866" izz="11.561496"/>
+    </inertial>
+  </link>
+
+ <joint name="joint11" type="revolute">
+    <parent link="link10"/>
+    <child link="link11"/>
+    <origin xyz="0 0 0.6"/>
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="link11">
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_03.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <material name="dorado" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_03.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="28.047"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0 0"/> -->
+      <inertia ixx="1.387599" ixy="0.0" ixz="-0.0" iyy="0.045668" iyz="0.006528" izz="1.365151"/>
+    </inertial>
+  </link>
+
+<joint name="jc1" type="revolute"><!--cambio de nombre-->
+    <parent link="link11"/><!--link con nuevo nombre-->
+    <child link="lc1"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0.4 0"/><!--altura nueva de link1-->
+    <axis xyz="0 0 1" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="lc1"><!--nuevo link-->
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_04.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 1.57075 0" xyz="0 0 0"/>
+      <material name="n_negro" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_04.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="8.330"/>
+      <!-- <origin rpy="0 1.57075 0" xyz="0 0 0"/> -->
+      <inertia ixx="0.051603" ixy="0.0" ixz="-0.0" iyy="0.008680" iyz="0.0" izz="0.048753"/>
+    </inertial>
+  </link>
+
+  <joint name="jc2" type="revolute"><!--cambio de nombre-->
+    <parent link="lc1"/><!--link con nuevo nombre-->
+    <child link="lc2"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0.16 0"/><!--altura nueva de link1-->
+    <axis xyz="1 0 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="lc2"><!--nuevo link-->
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_05.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="1.57075 0 0" xyz="0 0 0"/>
+      <material name="b_negro" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_05.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="8.470"/>
+      <!-- <origin rpy="1.57075 0 0" xyz="0 0 0"/> -->
+      <inertia ixx="0.001883" ixy="0.0" ixz="-0.0" iyy="0.001935" iyz="0.0" izz="0.000654"/>
+    </inertial>
+  </link>
+
+
+  <joint name="jc3" type="revolute"><!--cambio de nombre-->
+    <parent link="lc2"/><!--link con nuevo nombre-->
+    <child link="l5"/><!--se une a nuevo link creado-->
+    <origin xyz="0 0 0"/><!--altura nueva de link1-->
+    <axis xyz="0 1 0" />
+    <limit effort="300" velocity="0.1" lower="-3.1" upper="3.1"/>
+  </joint>
+
+  <link name="l5">
+    <visual>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_06_gripper.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+      <origin rpy="0 0 0" xyz="0 0.06 0"/>
+      <material name="red" />
+    </visual>
+    <collision>
+      <geometry>
+        <mesh filename="package://frproj/urdf/meshes/brazo_06_gripper.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="8.470"/>
+      <!-- <origin rpy="0 0 0" xyz="0 0.06 0"/> -->
+      <inertia ixx="0.020919" ixy="0.0" ixz="0.0" iyy="0.001792" iyz="0.0" izz="0.022240"/>
+    </inertial>
+  </link>
+
+</robot>

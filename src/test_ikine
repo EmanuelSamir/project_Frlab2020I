@@ -1,0 +1,60 @@
+#!/usr/bin/env python
+
+import rospy
+from sensor_msgs.msg import JointState
+from markers import *
+from projfunctions import *
+
+
+rospy.init_node("testInvKine")
+pub = rospy.Publisher('joint_states', JointState, queue_size=1000)
+
+bmarker      = BallMarker(color['YELLOW'])
+bmarker_des  = BallMarker(color['GREEN'])
+#dimensions
+#l=np.array([0.032,1.5,0.502,0.6,0.4,0.155,0.07,0.110])#0.4s
+l=np.array([0.022,1.5,0.502,0.6,0.4,0.155,0.07,0.14])#0.4
+# Joint names
+jnames = ['pan_joint', 'tilt_joint', 'joint10', 'joint11', 'jc1', 'jc2','jc3']
+
+# Desired position
+xd = np.array([ 0.5, -0.4, 1.6])
+# Initial configuration
+q0 = np.array([0,0,0,0,0,0,0])
+#q0 = np.array([-3,0,-3,-3,-3,-3,-3])
+# Inverse kinematics
+q = ikine_samo(l,xd, q0)
+if (q[1]<0 or q[1]>1.5):
+    q0 = np.array([pi/2,1.5,0,0,0,0,0])
+    q = ikine_samo(l,xd, q0)
+print('Obtained q:\n', q)
+
+# Resulting position (end effector with respect to the base link)
+T = fkine_samo(l,q)
+print('Obtained value:\n', np.round(T,3))
+
+# Red marker shows the achieved position
+bmarker.xyz(T[0:3,3])
+# Green marker shows the desired position
+bmarker_des.xyz(xd)
+
+# Objeto (mensaje) de tipo JointState
+jstate = JointState()
+# Asignar valores al mensaje
+jstate.header.stamp = rospy.Time.now()
+jstate.name = jnames
+# Add the head joint value (with value 0) to the joints
+jstate.position = q
+
+# Loop rate (in Hz)
+rate = rospy.Rate(100)
+# Continuous execution loop
+while not rospy.is_shutdown():
+    # Current time (needed for ROS)
+    jstate.header.stamp = rospy.Time.now()
+    # Publish the message
+    pub.publish(jstate)
+    bmarker.publish()
+    bmarker_des.publish()
+    # Wait for the next iteration
+    rate.sleep()
